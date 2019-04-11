@@ -252,6 +252,7 @@
     <Content Include="Views\Home\First.cshtml" />
     <Content Include="Views\Home\Second.cshtml" />
     <Content Include="Views\Home\Configure.cshtml" />
+    <Content Include="Web.config.secrets" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
