@@ -52,7 +52,9 @@ namespace Microsoft.Teams.Samples.HelloWorld.Web.Controllers
                 Title = "Time to sign in",
                 Buttons = new List<CardAction>
                 {
-                    new CardAction(ActionTypes.Signin, "Do it!", value: baseUri + "/popUpSignin.html?height=200&width=200"),
+                    new CardAction(type: ActionTypes.Signin, 
+                    title: "Do it!", 
+                    value: baseUri + "/popUpSignin.html?height=200&width=200"),
                 }
             };
 
