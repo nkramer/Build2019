@@ -105,11 +105,11 @@
     <Reference Include="Microsoft.Data.Services.Client, Version=5.7.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Data.Services.Client.5.7.0\lib\net40\Microsoft.Data.Services.Client.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Graph, Version=1.14.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Graph.1.14.0\lib\net45\Microsoft.Graph.dll</HintPath>
+    <Reference Include="Microsoft.Graph.Beta, Version=0.2.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Graph.Beta.0.2.0-preview\lib\net45\Microsoft.Graph.Beta.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Graph.Core, Version=1.14.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Graph.Core.1.14.0\lib\net45\Microsoft.Graph.Core.dll</HintPath>
+      <HintPath>..\packages\Microsoft.Graph.Core.1.14.1\lib\net45\Microsoft.Graph.Core.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Identity.Client, Version=3.0.4.0, Culture=neutral, PublicKeyToken=0a613f4dd989e8ae, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Identity.Client.3.0.4-preview\lib\net45\Microsoft.Identity.Client.dll</HintPath>
@@ -228,27 +228,8 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="MessageExtension.cs" />
-    <Compile Include="Models\AADUserConversationMember.cs" />
-    <Compile Include="Models\BodyType.cs" />
-    <Compile Include="Models\ChatMessage.cs" />
-    <Compile Include="Models\ChatMessageAttachment.cs" />
-    <Compile Include="Models\ChatMessageHostedImage.cs" />
-    <Compile Include="Models\ChatMessageImportance.cs" />
-    <Compile Include="Models\ChatMessageMention.cs" />
-    <Compile Include="Models\ChatMessagePolicyViolation.cs" />
-    <Compile Include="Models\ChatMessagePolicyViolationDlpActionType.cs" />
-    <Compile Include="Models\ChatMessagePolicyViolationPolicyTip.cs" />
-    <Compile Include="Models\ChatMessagePolicyViolationUserActionType.cs" />
-    <Compile Include="Models\ChatMessagePolicyViolationVerdictDetailsType.cs" />
-    <Compile Include="Models\ChatMessageReaction.cs" />
-    <Compile Include="Models\ChatMessageType.cs" />
-    <Compile Include="Models\ConversationMember.cs" />
-    <Compile Include="Models\GraphResource.cs" />
     <Compile Include="Models\GraphService.cs" />
     <Compile Include="Models\HttpHelpers.cs" />
-    <Compile Include="Models\Identity.cs" />
-    <Compile Include="Models\IdentitySet.cs" />
-    <Compile Include="Models\ItemBody.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

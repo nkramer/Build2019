@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Linq;
+using Microsoft.Graph;
 
 namespace ContosoAirlines.Models
 {
@@ -156,7 +157,7 @@ namespace ContosoAirlines.Models
             foreach (var team in teams)
             {
                 var t = await HttpGet<Team>($"/teams/{team.Id}");
-                if (!t.IsArchived)
+                if (!t.IsArchived.Value)
                 {
                     // See if it's already installed
                     var apps = await HttpGetList<TeamsAppInstallation>($"/teams/{team.Id}/installedApps?$expand=teamsAppDefinition");
@@ -215,42 +216,42 @@ namespace ContosoAirlines.Models
         //    return link;
         //}
 
-        public async Task ArchiveAllTeams()
-        {
-            var teams = (await GetAllTeams()).Where(
-                t => t.DisplayName.StartsWith("Flight 157") 
-                || t.DisplayName.StartsWith("Flight 4157"))
-                .ToArray();
-            foreach (var team in teams)
-            {
-                var t = await HttpGet<Team>($"/teams/{team.Id}");
-                if (!t.IsArchived)
-                {
-                    await ArchiveTeam(team.Id);
-                }
-            }
-        }
+        //public async Task ArchiveAllTeams()
+        //{
+        //    var teams = (await GetAllTeams()).Where(
+        //        t => t.DisplayName.StartsWith("Flight 157") 
+        //        || t.DisplayName.StartsWith("Flight 4157"))
+        //        .ToArray();
+        //    foreach (var team in teams)
+        //    {
+        //        var t = await HttpGet<Team>($"/teams/{team.Id}");
+        //        if (!t.IsArchived.Value)
+        //        {
+        //            await ArchiveTeam(team.Id);
+        //        }
+        //    }
+        //}
 
-        public async Task<string> ArchiveTeam(string teamId)
-        {
-            HttpResponse response = await HttpPostWithHeaders($"/teams/{teamId}/archive", "{}");
-            string operationUrl = response.Headers.Location.ToString();
+        //public async Task<string> ArchiveTeam(string teamId)
+        //{
+        //    HttpResponse response = await HttpPostWithHeaders($"/teams/{teamId}/archive", "{}");
+        //    string operationUrl = response.Headers.Location.ToString();
 
-            for (; ; )
-            {
-                var operation = await HttpGet<TeamsAsyncOperation>(operationUrl);
+        //    for (; ; )
+        //    {
+        //        var operation = await HttpGet<TeamsAsyncOperation>(operationUrl);
 
-                if (operation.Status == AsyncOperationStatus.Failed)
-                    throw new Exception();
+        //        if (operation.Status.Value == AsyncOperationStatus.Failed)
+        //            throw new Exception();
 
-                if (operation.Status == AsyncOperationStatus.Succeeded)
-                    break;
+        //        if (operation.Status == AsyncOperationStatus.Succeeded)
+        //            break;
 
-                Thread.Sleep(10000); // wait 10 seconds between polls
-            }
+        //        Thread.Sleep(10000); // wait 10 seconds between polls
+        //    }
 
-            return "success";
-        }
+        //    return "success";
+        //}
 
         // Get all the teams you have access to. For user delegated, look at the joinedTeams.
         // For application permissions, get all teams in the tenant.
@@ -449,17 +450,17 @@ namespace ContosoAirlines.Models
         //        });
 
 
-        public async Task<SharePointList> CreateSharePointListAsync(string siteId, SharePointList list)
+        public async Task<Microsoft.Graph.List> CreateSharePointListAsync(string siteId, Microsoft.Graph.List list)
         {
             var response = await HttpPost($"/sites/{siteId}/lists", list);
-            return JsonConvert.DeserializeObject<SharePointList>(response);
+            return JsonConvert.DeserializeObject<Microsoft.Graph.List>(response);
         }
 
         public async Task<string> GetAdminUpn()
         {
             // Figure out the members and owners
             var me = await HttpGet<User>($"/me");
-            return me.userPrincipalName;
+            return me.UserPrincipalName;
         }
 
 

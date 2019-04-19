@@ -10,6 +10,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
+using Microsoft.Graph;
 
 namespace ContosoAirlines.Models
 {
@@ -24,6 +25,12 @@ namespace ContosoAirlines.Models
             }
             return JsonConvert.DeserializeObject<T>(result, HttpHelpers.jsonSettings);
         }
+    }
+
+    public class ResultList<T>
+    {
+        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
+        public T[] value { get; set; }
     }
 
     public class HttpHelpers
