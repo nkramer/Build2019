@@ -43,7 +43,7 @@ namespace Microsoft.Teams.Samples.HelloWorld.Web.Controllers
                     string token = await GetToken();
                     var svc = new GraphService();
                     svc.accessToken = token;
-                    svc.GetTeam(teamid);
+                    svc.GetTeam(teamid, channelId);
                     
 
                     await Conversation.SendAsync(activity, () => CreateGetTokenDialog());

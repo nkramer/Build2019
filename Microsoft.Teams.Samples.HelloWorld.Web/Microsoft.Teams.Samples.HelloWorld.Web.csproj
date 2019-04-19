@@ -228,9 +228,27 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="MessageExtension.cs" />
+    <Compile Include="Models\AADUserConversationMember.cs" />
+    <Compile Include="Models\BodyType.cs" />
+    <Compile Include="Models\ChatMessage.cs" />
+    <Compile Include="Models\ChatMessageAttachment.cs" />
+    <Compile Include="Models\ChatMessageHostedImage.cs" />
+    <Compile Include="Models\ChatMessageImportance.cs" />
+    <Compile Include="Models\ChatMessageMention.cs" />
+    <Compile Include="Models\ChatMessagePolicyViolation.cs" />
+    <Compile Include="Models\ChatMessagePolicyViolationDlpActionType.cs" />
+    <Compile Include="Models\ChatMessagePolicyViolationPolicyTip.cs" />
+    <Compile Include="Models\ChatMessagePolicyViolationUserActionType.cs" />
+    <Compile Include="Models\ChatMessagePolicyViolationVerdictDetailsType.cs" />
+    <Compile Include="Models\ChatMessageReaction.cs" />
+    <Compile Include="Models\ChatMessageType.cs" />
+    <Compile Include="Models\ConversationMember.cs" />
     <Compile Include="Models\GraphResource.cs" />
     <Compile Include="Models\GraphService.cs" />
     <Compile Include="Models\HttpHelpers.cs" />
+    <Compile Include="Models\Identity.cs" />
+    <Compile Include="Models\IdentitySet.cs" />
+    <Compile Include="Models\ItemBody.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

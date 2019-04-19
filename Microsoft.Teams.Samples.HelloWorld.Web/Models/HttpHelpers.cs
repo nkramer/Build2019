@@ -30,7 +30,7 @@ namespace ContosoAirlines.Models
     {
         public HttpClient httpClient = new HttpClient();
         public string accessToken;
-        public string graphV1Endpoint= "https://graph.microsoft.com/v1.0";
+        public string graphV1Endpoint= "https://graph.microsoft.com/beta"; //"https://graph.microsoft.com/v1.0";
         public string graphBetaEndpoint = "https://graph.microsoft.com/beta";
         public static readonly JsonSerializerSettings jsonSettings =
             new JsonSerializerSettings { ContractResolver = new CamelCasePropertyNamesContractResolver() };

@@ -14,9 +14,12 @@ namespace ContosoAirlines.Models
 {
     public class GraphService : HttpHelpers
     {
-        public async Task GetTeam(string teamid)
+        public async Task GetTeam(string teamid, string channelid)
         {
             var t = await HttpGet<Team>($"/teams/{teamid}");
+            ChatMessage[] msgs = await HttpGetList<ChatMessage>($"/teams/{teamid}/channels/{channelid}/messages");
+
+            var ms = msgs.Select(m => m.Body.Content).ToArray();
         }
 
 

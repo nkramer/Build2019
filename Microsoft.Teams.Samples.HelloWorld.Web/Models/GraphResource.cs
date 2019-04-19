@@ -343,20 +343,20 @@ namespace ContosoAirlines.Models
         public string Email { get; set; }
     }
 
-    public class ChatThread
-    {
-        public ChatMessage RootMessage { get; set; }
-    }
+    //public class ChatThread
+    //{
+    //    public ChatMessage RootMessage { get; set; }
+    //}
 
-    public class ChatMessage
-    {
-        public ItemBody Body { get; set; }
-    }
+    //public class ChatMessage
+    //{
+    //    public ItemBody Body { get; set; }
+    //}
 
-    public class ItemBody
-    {
-        public string Content { get; set; }
-    }
+    //public class ItemBody
+    //{
+    //    public string Content { get; set; }
+    //}
 
     public class TeamsApp
     {
