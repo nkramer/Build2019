@@ -9,6 +9,7 @@ using Microsoft.Bot.Connector.Teams;
 using Microsoft.Bot.Connector.Teams.Models;
 using System.Configuration;
 using System.Collections.Generic;
+using Microsoft.Bot.Builder.Dialogs;
 
 namespace Microsoft.Teams.Samples.HelloWorld.Web.Controllers
 {
@@ -18,6 +19,7 @@ namespace Microsoft.Teams.Samples.HelloWorld.Web.Controllers
         [HttpPost]
         public async Task<HttpResponseMessage> Post([FromBody] Activity activity)
         {
+            
             using (var connector = new ConnectorClient(new Uri(activity.ServiceUrl)))
             {
                 if (activity.IsComposeExtensionQuery())
@@ -29,16 +31,34 @@ namespace Microsoft.Teams.Samples.HelloWorld.Web.Controllers
                 }
                 else
                 {
-                    //connector.Conversations.CreateConversation(new ConversationParameters() { })
-                    var reply = activity.CreateReply("dfj");
-                    reply.Attachments.Add(GetPopUpSignInCard());
-                    await connector.Conversations.ReplyToActivityWithRetriesAsync(reply);
+                    string channelId = activity.Conversation.Id.Split(';')[0];
+                    var details = connector.GetTeamsConnectorClient().Teams.FetchTeamDetails(channelId);
+                    string teamid = details.AadGroupId;
+                    string userid = activity.From.AadObjectId;
+
+                    await Conversation.SendAsync(activity, () => CreateGetTokenDialog());
                     return new HttpResponseMessage(HttpStatusCode.Accepted);
+
+                    //var reply = activity.CreateReply("dfj");
+                    //reply.Attachments.Add(GetPopUpSignInCard());
+                    //await connector.Conversations.ReplyToActivityWithRetriesAsync(reply);
+                    //return new HttpResponseMessage(HttpStatusCode.Accepted);
 
                     //await EchoBot.EchoMessage(connector, activity);
                     //return new HttpResponseMessage(HttpStatusCode.Accepted);
                 }
             }
+        }
+
+        private GetTokenDialog CreateGetTokenDialog()
+        {
+            string ConnectionName = "sample";
+            return new GetTokenDialog(
+                connectionName: ConnectionName,
+                signInMessage: $"Please sign in to {ConnectionName} to proceed.",
+                buttonLabel: "Sign In",
+                retries: 0,//2, 
+                retryMessage: "Hmm. Something went wrong, let's try again.");
         }
 
 

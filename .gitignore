@@ -288,3 +288,4 @@ __pycache__/
 *.xsd.cs
 
 Microsoft.Teams.Samples.HelloWorld.Web/Web.config.secrets
+/Microsoft.Teams.Samples.HelloWorld.Web/Web.config.secrets-old
