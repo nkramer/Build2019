@@ -228,6 +228,9 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="MessageExtension.cs" />
+    <Compile Include="Models\GraphResource.cs" />
+    <Compile Include="Models\GraphService.cs" />
+    <Compile Include="Models\HttpHelpers.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

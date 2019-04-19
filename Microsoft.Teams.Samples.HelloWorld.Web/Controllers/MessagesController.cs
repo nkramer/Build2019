@@ -10,6 +10,8 @@ using Microsoft.Bot.Connector.Teams.Models;
 using System.Configuration;
 using System.Collections.Generic;
 using Microsoft.Bot.Builder.Dialogs;
+using ContosoAirlines.Models;
+using System.Web;
 
 namespace Microsoft.Teams.Samples.HelloWorld.Web.Controllers
 {
@@ -35,6 +37,14 @@ namespace Microsoft.Teams.Samples.HelloWorld.Web.Controllers
                     var details = connector.GetTeamsConnectorClient().Teams.FetchTeamDetails(channelId);
                     string teamid = details.AadGroupId;
                     string userid = activity.From.AadObjectId;
+
+                    string prompt = AdminConsentPromptUrl();
+
+                    string token = await GetToken();
+                    var svc = new GraphService();
+                    svc.accessToken = token;
+                    svc.GetTeam(teamid);
+                    
 
                     await Conversation.SendAsync(activity, () => CreateGetTokenDialog());
                     return new HttpResponseMessage(HttpStatusCode.Accepted);
@@ -81,5 +91,45 @@ namespace Microsoft.Teams.Samples.HelloWorld.Web.Controllers
             return heroCard.ToAttachment();
         }
 
+
+        public static string tenantName = "M365x168483.onmicrosoft.com";
+
+        public static string AdminConsentPromptUrl()
+        {
+            string appId = ConfigurationManager.AppSettings["ida:AppId"];
+            string redirectUri = ConfigurationManager.AppSettings["ida:RedirectUri"];
+
+            string adminConsentPrompt = $"https://login.microsoftonline.com/common/adminconsent?client_id={appId}&state=12345&redirect_uri={redirectUri}";
+            return adminConsentPrompt;
+        }
+
+        private async Task<string> GetToken(/*RootModel rootModel*/)
+        {
+            string token;
+            //if (HomeController.useAppPermissions)
+            //{
+                string appId = ConfigurationManager.AppSettings["MicrosoftAppId"];
+                string redirectUri = ConfigurationManager.AppSettings["RedirectUri"];
+                string appSecret = HttpUtility.UrlEncode(ConfigurationManager.AppSettings["MicrosoftAppPassword"]);
+
+                string tenant = tenantName;
+                string response = await HttpHelpers.POST($"https://login.microsoftonline.com/{tenant}/oauth2/v2.0/token",
+                      $"grant_type=client_credentials&client_id={appId}&client_secret={appSecret}"
+                      + "&scope=https%3A%2F%2Fgraph.microsoft.com%2F.default");
+                token = response.Deserialize<TokenResponse>().access_token;
+            //}
+            //else
+            //{
+            //    token = await SampleAuthProvider.Instance.GetUserAccessTokenAsync();
+            //}
+            //graphService.accessToken = token;
+            return token;
+        }
+    }
+
+    // Used only for de-serializing JSON
+    public class TokenResponse
+    {
+        public string access_token { get; set; }
     }
 }
