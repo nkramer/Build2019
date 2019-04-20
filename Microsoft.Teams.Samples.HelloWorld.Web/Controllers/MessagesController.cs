@@ -34,6 +34,7 @@ namespace Microsoft.Teams.Samples.HelloWorld.Web.Controllers
                 else
                 {
                     string channelId = activity.Conversation.Id.Split(';')[0];
+                    string messageId = activity.Conversation.Id.Split(new string[] { ";messageid=" }, StringSplitOptions.None)[1];
                     var details = connector.GetTeamsConnectorClient().Teams.FetchTeamDetails(channelId);
                     string teamid = details.AadGroupId;
                     string userid = activity.From.AadObjectId;
@@ -43,7 +44,7 @@ namespace Microsoft.Teams.Samples.HelloWorld.Web.Controllers
                     string token = await GetToken();
                     var svc = new GraphService();
                     svc.accessToken = token;
-                    svc.GetTeam(teamid, channelId);
+                    svc.GetTeam(teamid, channelId, messageId);
                     
 
                     await Conversation.SendAsync(activity, () => CreateGetTokenDialog());

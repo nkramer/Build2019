@@ -4,3 +4,20 @@
 <p>
     Welcome to Microsoft Teams Hello World sample app (C#)
 </p>
+
+@foreach (var q in ContosoAirlines.Models.QandA.Questions)
+{
+    <div> 
+        (@q.Votes) 
+        @q.Text 
+        @if (ContosoAirlines.Models.QandA.IsQuestionAnswered[q.MessageId])
+        {
+            <div> ANSWERED </div>
+        }
+        else
+        {
+            <div> NOT ANSWERED </div>
+        }
+    </div>
+    <br/>
+}

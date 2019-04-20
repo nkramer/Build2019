@@ -4,3 +4,32 @@
 <p>
     Welcome to Microsoft Teams Hello World sample app (C#)
 </p>
+
+<p>
+    @ContosoAirlines.Models.QandA.Questions.Count
+    questions
+</p>
+
+@foreach (var q in ContosoAirlines.Models.QandA.Questions)
+{
+    <div>
+        (@q.Votes)
+        @q.Text
+        @if (ContosoAirlines.Models.QandA.IsQuestionAnswered.ContainsKey(q.MessageId) && ContosoAirlines.Models.QandA.IsQuestionAnswered[q.MessageId])
+        {
+            <div> ANSWERED </div>
+        }
+        else
+        {
+            <div> NOT ANSWERED </div>
+        }
+    </div>
+    <br />
+}
+
+
+<script>
+    var x = setInterval(function() {
+        window.location.reload(true);
+    }, 10 * 1000); // 10s 
+</script>

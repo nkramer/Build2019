@@ -13,14 +13,62 @@ using Microsoft.Graph;
 
 namespace ContosoAirlines.Models
 {
-    public class GraphService : HttpHelpers
+    public class Question
     {
-        public async Task GetTeam(string teamid, string channelid)
-        {
-            var t = await HttpGet<Team>($"/teams/{teamid}");
-            ChatMessage[] msgs = await HttpGetList<ChatMessage>($"/teams/{teamid}/channels/{channelid}/messages");
+        public string MessageId;
+        public int Votes;
+        public string Text;
+//        public bool IsAnswered;
+    }
 
-            var ms = msgs.Select(m => m.Body.Content).ToArray();
+    public class QandA
+    {
+        public static List<Question> Questions = new List<Question>();
+        public static Dictionary<string, bool> IsQuestionAnswered = new Dictionary<string, bool>(); // maps message id -> isAnswered
+        public static string RootMessageId = "1555716696233";
+        public static string RootChannel = "19:81eff88fa60f4386aab1b5a0a5e4c797@thread.skype";
+        public static string RootTeam = "21ad502b-d790-4359-a10f-8fa1d5722a29";
+    }
+
+        public class GraphService : HttpHelpers
+    {
+        private bool IsQuestion(ChatMessage msg)
+        {
+            if (msg.From.User == null)  // sender is bot
+                return false;
+            if (msg.Mentions == null) // no @mention
+                return true;
+            foreach (var men in msg.Mentions)
+            {
+                if (men.Mentioned.Application != null
+                    && (men.Mentioned.Application.AdditionalData["applicationIdentityType"] as string) == "bot")
+                    return false;
+            }
+            return true;
+        }
+
+        
+
+        public async Task GetTeam(string teamid, string channelid, string messageId)
+        {
+            //var t = await HttpGet<Team>($"/teams/{teamid}");
+            ChatMessage[] msgs = await HttpGetList<ChatMessage>($"/teams/{teamid}/channels/{channelid}/messages/{messageId}/replies?$top=50");
+
+            // merge w/ existing Qs
+            //var lookup = QandA.Questions.ToLookup(q => q.MessageId);
+            var questions =
+                from m in msgs
+                where IsQuestion(m)
+                //where m.From.User != null && (m.Mentions == null || m.Mentions.Where(men => men.Mentioned.Application != null && men.Mentioned )
+                //&& !QandA.Questions.Exists(q => q.MessageId == m.Id)
+                select new Question() { MessageId = m.Id, /*IsAnswered = false, */Text = m.Body.Content, Votes = m.Reactions.Count() };
+            QandA.Questions = questions.OrderBy(m => m.Votes).ToList();
+
+            foreach (var q in questions)
+            {
+                if (!QandA.IsQuestionAnswered.ContainsKey(q.MessageId))
+                    QandA.IsQuestionAnswered[q.MessageId] = false;
+            }
         }
 
 
