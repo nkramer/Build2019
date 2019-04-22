@@ -38,13 +38,34 @@ namespace Microsoft.Teams.Samples.HelloWorld.Web.Controllers
                     string teamid = details.AadGroupId;
                     string userid = activity.From.AadObjectId;
 
-                    string prompt = AdminConsentPromptUrl();
+                    //string baseUri = "https://303ad795.ngrok.io";
+                    string baseUri = "http://localhost:3333";
+                    string url = $"{baseUri}/?team={teamid}&channel={channelId}&message={messageId}";
 
-                    string token = await GetToken();
-                    var svc = new GraphService();
-                    svc.accessToken = token;
-                    svc.GetTeam(teamid, channelId, messageId);
-                    
+                    var heroCard = new HeroCard
+                    {
+                        Title = "Starting Q&A tracker",
+                        Buttons = new List<CardAction>
+                        {
+                            new CardAction(type: ActionTypes.OpenUrl,
+                            title: "View questions",
+                            value: url)
+                        }
+                    };
+
+                    var reply = activity.CreateReply("");
+                    reply.Attachments.Add(heroCard.ToAttachment());
+                    await connector.Conversations.ReplyToActivityWithRetriesAsync(reply);
+                    return new HttpResponseMessage(HttpStatusCode.Accepted);
+
+
+                    //string prompt = AdminConsentPromptUrl();
+
+                    //string token = await GetToken();
+                    //var svc = new GraphService();
+                    //svc.accessToken = token;
+                    //svc.GetTeam(teamid, channelId, messageId);
+
 
                     await Conversation.SendAsync(activity, () => CreateGetTokenDialog());
                     return new HttpResponseMessage(HttpStatusCode.Accepted);
