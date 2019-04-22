@@ -230,6 +230,7 @@
     <Compile Include="MessageExtension.cs" />
     <Compile Include="Models\GraphService.cs" />
     <Compile Include="Models\HttpHelpers.cs" />
+    <Compile Include="Models\QuestionStatus.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

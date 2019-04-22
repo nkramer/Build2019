@@ -20,8 +20,7 @@ namespace Microsoft.Teams.Samples.HelloWorld.Web.Controllers
     {
         [HttpPost]
         public async Task<HttpResponseMessage> Post([FromBody] Activity activity)
-        {
-            
+        {            
             using (var connector = new ConnectorClient(new Uri(activity.ServiceUrl)))
             {
                 if (activity.IsComposeExtensionQuery())
@@ -104,7 +103,7 @@ namespace Microsoft.Teams.Samples.HelloWorld.Web.Controllers
             return adminConsentPrompt;
         }
 
-        private async Task<string> GetToken(/*RootModel rootModel*/)
+        public static async Task<string> GetToken(/*RootModel rootModel*/)
         {
             string token;
             //if (HomeController.useAppPermissions)

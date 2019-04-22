@@ -20,6 +20,14 @@ namespace ContosoAirlines.Models
         public string Text;
 //        public bool IsAnswered;
     }
+    public class QandAModel
+    {
+        public List<Question> Questions = new List<Question>();
+        public Dictionary<string, bool> IsQuestionAnswered = new Dictionary<string, bool>(); // maps message id -> isAnswered
+        public string RootMessageId = "1555716696233";
+        public string RootChannel = "19:81eff88fa60f4386aab1b5a0a5e4c797@thread.skype";
+        public string RootTeam = "21ad502b-d790-4359-a10f-8fa1d5722a29";
+    }
 
     public class QandA
     {
@@ -30,8 +38,26 @@ namespace ContosoAirlines.Models
         public static string RootTeam = "21ad502b-d790-4359-a10f-8fa1d5722a29";
     }
 
-        public class GraphService : HttpHelpers
+    public class GraphService : HttpHelpers
     {
+        public async Task RefreshQandA(QandAModel qanda)
+        {
+            ChatMessage[] msgs = await HttpGetList<ChatMessage>($"/teams/{qanda.RootTeam}/channels/{qanda.RootChannel}/messages/{qanda.RootMessageId}/replies?$top=50");
+
+            // merge w/ existing Qs
+            var questions =
+                from m in msgs
+                where IsQuestion(m)
+                select new Question() { MessageId = m.Id, /*IsAnswered = false, */Text = m.Body.Content, Votes = m.Reactions.Count() };
+            qanda.Questions = questions.OrderBy(m => m.Votes).ToList();
+
+            foreach (var q in questions)
+            {
+                if (!qanda.IsQuestionAnswered.ContainsKey(q.MessageId))
+                    qanda.IsQuestionAnswered[q.MessageId] = false;
+            }
+        }
+
         private bool IsQuestion(ChatMessage msg)
         {
             if (msg.From.User == null)  // sender is bot
@@ -45,9 +71,7 @@ namespace ContosoAirlines.Models
                     return false;
             }
             return true;
-        }
-
-        
+        }      
 
         public async Task GetTeam(string teamid, string channelid, string messageId)
         {

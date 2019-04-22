@@ -1,16 +1,18 @@
-﻿<div class="font-semibold font-title">
+﻿@model ContosoAirlines.Models.QandAModel
+
+<div class="font-semibold font-title">
     This is our first tab
 </div>
 <p>
-    Welcome to Microsoft Teams Hello World sample app (C#)
+    No welcome to Microsoft Teams Hello World sample app (C#)
 </p>
 
-@foreach (var q in ContosoAirlines.Models.QandA.Questions)
+@foreach (var q in Model.Questions)
 {
     <div> 
         (@q.Votes) 
         @q.Text 
-        @if (ContosoAirlines.Models.QandA.IsQuestionAnswered[q.MessageId])
+        @if (Model.IsQuestionAnswered[q.MessageId])
         {
             <div> ANSWERED </div>
         }
