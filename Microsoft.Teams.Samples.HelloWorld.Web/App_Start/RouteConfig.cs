@@ -9,6 +9,12 @@ namespace Microsoft.Teams.Samples.HelloWorld.Web
         {
             routes.IgnoreRoute("{resource}.axd/{*pathInfo}");
             routes.MapMvcAttributeRoutes();
+
+            routes.MapRoute(
+                "MarkAsAnswered",     // Route name
+                "{controller}/{action}/{key}/{messageId}",                           // URL with parameters
+                new { controller = "Home", action = "MarkAsAnswered", key = "", messageId = "" }  // Parameter defaults
+            );
         }
     }
 }

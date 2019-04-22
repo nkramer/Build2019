@@ -27,6 +27,11 @@ namespace ContosoAirlines.Models
         public string RootMessageId = "1555716696233";
         public string RootChannel = "19:81eff88fa60f4386aab1b5a0a5e4c797@thread.skype";
         public string RootTeam = "21ad502b-d790-4359-a10f-8fa1d5722a29";
+
+        public static string Encode(string teamId, string channelId, string msgId)
+            => $"{teamId}_{channelId}_{msgId}".Replace(':', '_'); // avoid asp.net bad chars -- see https://www.hanselman.com/blog/ExperimentsInWackinessAllowingPercentsAnglebracketsAndOtherNaughtyThingsInTheASPNETIISRequestURL.aspx
+
+        public string Key => Encode(RootTeam, RootChannel, RootMessageId);
     }
 
     public class QandA

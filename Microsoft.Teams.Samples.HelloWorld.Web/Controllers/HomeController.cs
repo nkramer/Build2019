@@ -2,18 +2,27 @@
 using System.Threading.Tasks;
 using System.Web.Mvc;
 using System.Collections.Generic;
+using System.Linq;
+
 
 namespace Microsoft.Teams.Samples.HelloWorld.Web.Controllers
 {
     public class HomeController : Controller
     {
+        [Route("Home/MarkAsAnswered")]
+        public ActionResult MarkAsAnswered(string key, string messageId)
+        {
+            QandAModel model = qandALookup[key];
+            model.IsQuestionAnswered[messageId] = true;
+            return View("Index", model);
+        }
+
         [Route("")]
         public async Task<ActionResult> Index()
         {
             string teamId = Request.QueryString["team"];
             string channelId = Request.QueryString["channel"];
             string msgId = Request.QueryString["message"];
-            string key = $"{teamId}/{channelId}/{msgId}";
 
             if (teamId == null)
             {
@@ -22,6 +31,7 @@ namespace Microsoft.Teams.Samples.HelloWorld.Web.Controllers
                 msgId = "1555716696233";
             }
 
+            string key = QandAModel.Encode(teamId, channelId, msgId);
             QandAModel model;
             if (qandALookup.ContainsKey(key))
             {

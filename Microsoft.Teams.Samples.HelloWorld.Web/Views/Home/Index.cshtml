@@ -1,12 +1,12 @@
 ﻿@model ContosoAirlines.Models.QandAModel
 
-<div class="font-semibold font-title">
+@*<div class="font-semibold font-title">
     Hello, World
 </div>
 
 <p>
     Don't welcome Microsoft Teams Hello World sample app (C#)
-</p>
+</p>*@
 
 @*<p>
     @ContosoAirlines.Models.QandA.Questions.Count
@@ -19,7 +19,12 @@
     <div>
         (@q.Votes)
         @q.Text
-      &nbsp;&nbsp;[@Html.ActionLink("Mark as answered", "giveAnswer", q)]
+      &nbsp;&nbsp;[@Html.ActionLink(
+                            linkText: "Mark as answered",
+                            actionName: "MarkAsAnswered",
+                            controllerName: "Home",
+                            routeValues: new { key = Model.Key, messageId = q.MessageId },
+                            htmlAttributes: null)]
     </div>
 }
 
