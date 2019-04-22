@@ -8,30 +8,33 @@
     Don't welcome Microsoft Teams Hello World sample app (C#)
 </p>
 
-<p>
+@*<p>
     @ContosoAirlines.Models.QandA.Questions.Count
     questions
-</p>
+</p>*@
 
-@foreach (var q in Model.Questions)
+<h2>Open questions</h2>
+@foreach (var q in Model.Questions.Where(q => !Model.IsQuestionAnswered[q.MessageId]))
 {
     <div>
         (@q.Votes)
         @q.Text
-        @if (Model.IsQuestionAnswered[q.MessageId])
-        {
-            <div> ANSWERED </div>
-        }
-        else
-        {
-            <div> NOT ANSWERED </div>
-        }
+      &nbsp;&nbsp;[@Html.ActionLink("Mark as answered", "giveAnswer", q)]
     </div>
-    <br />
+}
+
+<h2>Answered questions</h2>
+@foreach (var q in Model.Questions.Where(q => Model.IsQuestionAnswered[q.MessageId]))
+{
+    <div>
+        (@q.Votes)
+        @q.Text
+        @*@Html.ActionLink("Answer it", "giveAnswer", q)*@
+    </div>
 }
 
 <script>
-    var x = setInterval(function() {
-        window.location.reload(true);
-    }, 10 * 1000); // 10s 
+    //var x = setInterval(function() {
+    //    window.location.reload(true);
+    //}, 10 * 1000); // 10s 
 </script>

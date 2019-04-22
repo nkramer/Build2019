@@ -49,7 +49,7 @@ namespace ContosoAirlines.Models
                 from m in msgs
                 where IsQuestion(m)
                 select new Question() { MessageId = m.Id, /*IsAnswered = false, */Text = m.Body.Content, Votes = m.Reactions.Count() };
-            qanda.Questions = questions.OrderBy(m => m.Votes).ToList();
+            qanda.Questions = questions.OrderByDescending(m => m.Votes).ToList();
 
             foreach (var q in questions)
             {
