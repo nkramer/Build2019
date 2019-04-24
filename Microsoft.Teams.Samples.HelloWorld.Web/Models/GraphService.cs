@@ -10,6 +10,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Linq;
 using Microsoft.Graph;
+using Microsoft.Teams.Samples.HelloWorld.Web.Controllers;
 
 namespace ContosoAirlines.Models
 {
@@ -61,6 +62,8 @@ namespace ContosoAirlines.Models
                 if (!qanda.IsQuestionAnswered.ContainsKey(q.MessageId))
                     qanda.IsQuestionAnswered[q.MessageId] = false;
             }
+
+            MessagesController.UpdateCard();
         }
 
         private bool IsQuestion(ChatMessage msg)

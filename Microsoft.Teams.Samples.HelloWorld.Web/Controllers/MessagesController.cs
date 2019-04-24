@@ -18,9 +18,28 @@ namespace Microsoft.Teams.Samples.HelloWorld.Web.Controllers
     [BotAuthentication]
     public class MessagesController : ApiController
     {
+        public static Activity lastPost = null;
+        public static Uri lastUri = null;
+
+        public static async Task<HttpResponseMessage> UpdateCard()
+        {
+            if (lastPost != null)
+            {
+                using (var connector = new ConnectorClient(lastUri))
+                {
+                    var attachment = lastPost.Attachments[0];
+                    var card = (HeroCard) (attachment.Content);
+                    card.Subtitle = "5 unanswered";
+                    connector.Conversations.UpdateActivity(lastPost);
+                }
+            }
+            return null;
+        }
+
         [HttpPost]
         public async Task<HttpResponseMessage> Post([FromBody] Activity activity)
-        {            
+        {
+            lastUri = new Uri(activity.ServiceUrl);
             using (var connector = new ConnectorClient(new Uri(activity.ServiceUrl)))
             {
                 if (activity.IsComposeExtensionQuery())
@@ -44,7 +63,7 @@ namespace Microsoft.Teams.Samples.HelloWorld.Web.Controllers
 
                     var heroCard = new HeroCard
                     {
-                        Title = "Starting Q&A tracker",
+                        Title = "Q&A tracker",
                         Buttons = new List<CardAction>
                         {
                             new CardAction(type: ActionTypes.OpenUrl,
@@ -53,9 +72,11 @@ namespace Microsoft.Teams.Samples.HelloWorld.Web.Controllers
                         }
                     };
 
-                    var reply = activity.CreateReply("");
+                    Activity reply = activity.CreateReply("");
+                    lastPost = reply;
                     reply.Attachments.Add(heroCard.ToAttachment());
-                    await connector.Conversations.ReplyToActivityWithRetriesAsync(reply);
+                    var response = await connector.Conversations.ReplyToActivityWithRetriesAsync(reply);
+                    lastPost.Id = response.Id;
                     return new HttpResponseMessage(HttpStatusCode.Accepted);
 
 
