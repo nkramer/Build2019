@@ -11,98 +11,34 @@ using System.Threading.Tasks;
 using System.Linq;
 using Microsoft.Graph;
 using Microsoft.Teams.Samples.HelloWorld.Web.Controllers;
+using Microsoft.Teams.Samples.HelloWorld.Web.Models;
 
 namespace ContosoAirlines.Models
 {
-    public class Question
-    {
-        public string MessageId;
-        public int Votes;
-        public string Text;
-//        public bool IsAnswered;
-    }
-
-    public class QandAModel
-    {
-        public List<Question> Questions = new List<Question>();
-        public Dictionary<string, bool> IsQuestionAnswered = new Dictionary<string, bool>(); // maps message id -> isAnswered
-        public string RootMessageId = "1555716696233";
-        public string RootChannel = "19:81eff88fa60f4386aab1b5a0a5e4c797@thread.skype";
-        public string RootTeam = "21ad502b-d790-4359-a10f-8fa1d5722a29";
-
-        public static string Encode(string teamId, string channelId, string msgId)
-            => $"{teamId}_{channelId}_{msgId}".Replace(':', '_'); // avoid asp.net bad chars -- see https://www.hanselman.com/blog/ExperimentsInWackinessAllowingPercentsAnglebracketsAndOtherNaughtyThingsInTheASPNETIISRequestURL.aspx
-
-        public string Key => Encode(RootTeam, RootChannel, RootMessageId);
-    }
-
-    public class QandA
-    {
-        public static List<Question> Questions = new List<Question>();
-        public static Dictionary<string, bool> IsQuestionAnswered = new Dictionary<string, bool>(); // maps message id -> isAnswered
-        public static string RootMessageId = "1555716696233";
-        public static string RootChannel = "19:81eff88fa60f4386aab1b5a0a5e4c797@thread.skype";
-        public static string RootTeam = "21ad502b-d790-4359-a10f-8fa1d5722a29";
-    }
-
     public class GraphService : HttpHelpers
     {
-        public async Task RefreshQandA(QandAModel qanda)
-        {
-            ChatMessage[] msgs = await HttpGetList<ChatMessage>($"/teams/{qanda.RootTeam}/channels/{qanda.RootChannel}/messages/{qanda.RootMessageId}/replies?$top=50");
 
-            // merge w/ existing Qs
-            var questions =
-                from m in msgs
-                where IsQuestion(m)
-                select new Question() { MessageId = m.Id, /*IsAnswered = false, */Text = m.Body.Content, Votes = m.Reactions.Count() };
-            qanda.Questions = questions.OrderByDescending(m => m.Votes).ToList();
+        //public async Task GetTeam(string teamid, string channelid, string messageId)
+        //{
+        //    //var t = await HttpGet<Team>($"/teams/{teamid}");
+        //    ChatMessage[] msgs = await HttpGetList<ChatMessage>($"/teams/{teamid}/channels/{channelid}/messages/{messageId}/replies?$top=50");
 
-            foreach (var q in questions)
-            {
-                if (!qanda.IsQuestionAnswered.ContainsKey(q.MessageId))
-                    qanda.IsQuestionAnswered[q.MessageId] = false;
-            }
+        //    // merge w/ existing Qs
+        //    //var lookup = QandA.Questions.ToLookup(q => q.MessageId);
+        //    var questions =
+        //        from m in msgs
+        //        where IsQuestion(m)
+        //        //where m.From.User != null && (m.Mentions == null || m.Mentions.Where(men => men.Mentioned.Application != null && men.Mentioned )
+        //        //&& !QandA.Questions.Exists(q => q.MessageId == m.Id)
+        //        select new Question() { MessageId = m.Id, /*IsAnswered = false, */Text = m.Body.Content, Votes = m.Reactions.Count() };
+        //    QandA.Questions = questions.OrderBy(m => m.Votes).ToList();
 
-            MessagesController.UpdateCard();
-        }
-
-        private bool IsQuestion(ChatMessage msg)
-        {
-            if (msg.From.User == null)  // sender is bot
-                return false;
-            if (msg.Mentions == null) // no @mention
-                return true;
-            foreach (var men in msg.Mentions)
-            {
-                if (men.Mentioned.Application != null
-                    && (men.Mentioned.Application.AdditionalData["applicationIdentityType"] as string) == "bot")
-                    return false;
-            }
-            return true;
-        }      
-
-        public async Task GetTeam(string teamid, string channelid, string messageId)
-        {
-            //var t = await HttpGet<Team>($"/teams/{teamid}");
-            ChatMessage[] msgs = await HttpGetList<ChatMessage>($"/teams/{teamid}/channels/{channelid}/messages/{messageId}/replies?$top=50");
-
-            // merge w/ existing Qs
-            //var lookup = QandA.Questions.ToLookup(q => q.MessageId);
-            var questions =
-                from m in msgs
-                where IsQuestion(m)
-                //where m.From.User != null && (m.Mentions == null || m.Mentions.Where(men => men.Mentioned.Application != null && men.Mentioned )
-                //&& !QandA.Questions.Exists(q => q.MessageId == m.Id)
-                select new Question() { MessageId = m.Id, /*IsAnswered = false, */Text = m.Body.Content, Votes = m.Reactions.Count() };
-            QandA.Questions = questions.OrderBy(m => m.Votes).ToList();
-
-            foreach (var q in questions)
-            {
-                if (!QandA.IsQuestionAnswered.ContainsKey(q.MessageId))
-                    QandA.IsQuestionAnswered[q.MessageId] = false;
-            }
-        }
+        //    foreach (var q in questions)
+        //    {
+        //        if (!QandA.IsQuestionAnswered.ContainsKey(q.MessageId))
+        //            QandA.IsQuestionAnswered[q.MessageId] = false;
+        //    }
+        //}
 
 
         //public async Task<Tuple<string, string>> CreateTeam(Flight flight)

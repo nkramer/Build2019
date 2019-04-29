@@ -1,4 +1,4 @@
-﻿@model ContosoAirlines.Models.QandAModel
+﻿@model Microsoft.Teams.Samples.HelloWorld.Web.Models.QandAModel
 
 @*<div class="font-semibold font-title">
     Hello, World
@@ -12,34 +12,44 @@
     @ContosoAirlines.Models.QandA.Questions.Count
     questions
 </p>*@
-
-<h2>Open questions</h2>
-@foreach (var q in Model.Questions.Where(q => !Model.IsQuestionAnswered[q.MessageId]))
-{
-    <div>
-        (@q.Votes)
-        @q.Text
-      &nbsp;&nbsp;[@Html.ActionLink(
+<div class="jumbotron">
+    <h1>ASP.NET Graph Tutorial</h1>
+    <p class="lead">This sample app shows how to use the Microsoft Graph API to access Outlook and OneDrive data from ASP.NET</p>
+    @if (Request.IsAuthenticated)
+    {
+        <h2>Open questions</h2>
+        foreach (var q in Model.Questions.Where(q => !Model.IsQuestionAnswered[q.MessageId]))
+        {
+            <div>
+                (@q.Votes)
+                @q.Text
+                &nbsp;&nbsp;[@Html.ActionLink(
                             linkText: "Mark as answered",
                             actionName: "MarkAsAnswered",
                             controllerName: "Home",
                             routeValues: new { key = Model.Key, messageId = q.MessageId },
                             htmlAttributes: null)]
-    </div>
-}
+            </div>
+        }
 
-<h2>Answered questions</h2>
-@foreach (var q in Model.Questions.Where(q => Model.IsQuestionAnswered[q.MessageId]))
-{
-    <div>
-        (@q.Votes)
-        @q.Text
-        @*@Html.ActionLink("Answer it", "giveAnswer", q)*@
-    </div>
-}
+        <h2>Answered questions</h2>
+        foreach (var q in Model.Questions.Where(q => Model.IsQuestionAnswered[q.MessageId]))
+        {
+            <div>
+                (@q.Votes)
+                @q.Text
+                @*@Html.ActionLink("Answer it", "giveAnswer", q)*@
+            </div>
+        }
 
-<script>
-    var x = setInterval(function() {
-        window.location.reload(true);
-    }, 10 * 1000); // 10s 
-</script>
+        <script>
+            //var x = setInterval(function () {
+            //    window.location.reload(true);
+            //}, 10 * 1000); // 10s
+        </script>
+    }
+    else
+    {
+        @Html.ActionLink("Click here to sign in", "SignIn", "Account", new { area = "" }, new { @class = "btn btn-primary btn-large" })
+    }
+</div>
