@@ -46,7 +46,7 @@ namespace Microsoft.Teams.Samples.HelloWorld.Web.Controllers
             var svc = new GraphService();
             string token = await MessagesController.GetToken();
             svc.accessToken = token;
-            await svc.RefreshQandA(model);
+            //await svc.RefreshQandA(model);
 
             return View(model);
         }

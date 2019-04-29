@@ -21,6 +21,7 @@ namespace ContosoAirlines.Models
         public string Text;
 //        public bool IsAnswered;
     }
+
     public class QandAModel
     {
         public List<Question> Questions = new List<Question>();
