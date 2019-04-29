@@ -1,25 +1,8 @@
-﻿@model ContosoAirlines.Models.QandAModel
-
+﻿
 <div class="font-semibold font-title">
     This is our first tab
 </div>
 <p>
     No welcome to Microsoft Teams Hello World sample app (C#)
 </p>
-
-@foreach (var q in Model.Questions)
-{
-    <div> 
-        (@q.Votes) 
-        @q.Text 
-        @if (Model.IsQuestionAnswered[q.MessageId])
-        {
-            <div> ANSWERED </div>
-        }
-        else
-        {
-            <div> NOT ANSWERED </div>
-        }
-    </div>
-    <br/>
 }
