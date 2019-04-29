@@ -138,8 +138,8 @@ namespace Microsoft.Teams.Samples.HelloWorld.Web.Controllers
 
         public static string AdminConsentPromptUrl()
         {
-            string appId = ConfigurationManager.AppSettings["ida:AppId"];
-            string redirectUri = ConfigurationManager.AppSettings["ida:RedirectUri"];
+            string appId = Startup.appId;
+            string redirectUri = Startup.redirectUri;
 
             string adminConsentPrompt = $"https://login.microsoftonline.com/common/adminconsent?client_id={appId}&state=12345&redirect_uri={redirectUri}";
             return adminConsentPrompt;
@@ -150,9 +150,9 @@ namespace Microsoft.Teams.Samples.HelloWorld.Web.Controllers
             string token;
             //if (HomeController.useAppPermissions)
             //{
-                string appId = ConfigurationManager.AppSettings["MicrosoftAppId"];
-                string redirectUri = ConfigurationManager.AppSettings["RedirectUri"];
-                string appSecret = HttpUtility.UrlEncode(ConfigurationManager.AppSettings["MicrosoftAppPassword"]);
+            string appId = Startup.appId;
+            string redirectUri = Startup.redirectUri;
+            string appSecret = HttpUtility.UrlEncode(Startup.appSecret);
 
                 string tenant = tenantName;
                 string response = await HttpHelpers.POST($"https://login.microsoftonline.com/{tenant}/oauth2/v2.0/token",

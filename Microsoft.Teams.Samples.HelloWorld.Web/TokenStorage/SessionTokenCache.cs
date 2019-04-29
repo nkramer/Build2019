@@ -4,91 +4,110 @@
 */
 
 using Microsoft.Identity.Client;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Web;
 
-namespace ContosoAirlines.TokenStorage
+namespace Microsoft.Teams.Samples.HelloWorld.TokenStorage
 {
-
-    // Store the user's token information.
-    public class SessionTokenCache
+    // Simple class to serialize into the session
+    public class CachedUser
     {
-        private static ReaderWriterLockSlim SessionLock = new ReaderWriterLockSlim(LockRecursionPolicy.NoRecursion);
-        string UserId = string.Empty;
-        string CacheId = string.Empty;
-        HttpContextBase httpContext = null;
+        public string DisplayName { get; set; }
+        public string Email { get; set; }
+        public string Avatar { get; set; }
+    }
 
-        TokenCache cache = new TokenCache();
+    // Adapted from https://github.com/Azure-Samples/active-directory-dotnet-webapp-openidconnect-v2
+    public class SessionTokenStore
+    {
+        private static ReaderWriterLockSlim sessionLock = new ReaderWriterLockSlim(LockRecursionPolicy.NoRecursion);
+        private readonly string userId = string.Empty;
+        private readonly string cacheId = string.Empty;
+        private readonly string cachedUserId = string.Empty;
+        private HttpContextBase httpContext = null;
 
-        public SessionTokenCache(string userId, HttpContextBase httpcontext)
+        TokenCache tokenCache = new TokenCache();
+
+        public SessionTokenStore(string userId, HttpContextBase httpContext)
         {
-            // not object, we want the SUB
-            UserId = userId;
-            CacheId = UserId + "_TokenCache";
-            httpContext = httpcontext;
+            this.userId = userId;
+            cacheId = $"{userId}_TokenCache";
+            cachedUserId = $"{userId}_UserCache";
+            this.httpContext = httpContext;
             Load();
         }
 
         public TokenCache GetMsalCacheInstance()
         {
-            cache.SetBeforeAccess(BeforeAccessNotification);
-            cache.SetAfterAccess(AfterAccessNotification);
+            tokenCache.SetBeforeAccess(BeforeAccessNotification);
+            tokenCache.SetAfterAccess(AfterAccessNotification);
             Load();
-            return cache;
+            return tokenCache;
         }
 
-        public void SaveUserStateValue(string state)
+        public bool HasData()
         {
-            SessionLock.EnterWriteLock();
-            httpContext.Session[CacheId + "_state"] = state;
-            SessionLock.ExitWriteLock();
-        }
-        public string ReadUserStateValue()
-        {
-            string state = string.Empty;
-            SessionLock.EnterReadLock();
-            state = (string)httpContext.Session[CacheId + "_state"];
-            SessionLock.ExitReadLock();
-            return state;
-        }
-        public void Load()
-        {
-            SessionLock.EnterReadLock();
-            cache.Deserialize((byte[])httpContext.Session[CacheId]);
-            SessionLock.ExitReadLock();
+            return (httpContext.Session[cacheId] != null && ((byte[])httpContext.Session[cacheId]).Length > 0);
         }
 
-        public void Persist()
+        public void Clear()
         {
-            SessionLock.EnterWriteLock();
+            httpContext.Session.Remove(cacheId);
+        }
 
-            // Optimistically set HasStateChanged to false. We need to do it early to avoid losing changes made by a concurrent thread.
-            cache.HasStateChanged = false;
+        private void Load()
+        {
+            sessionLock.EnterReadLock();
+            tokenCache.Deserialize((byte[])httpContext.Session[cacheId]);
+            sessionLock.ExitReadLock();
+        }
 
-            // Reflect changes in the persistent store
-            httpContext.Session[CacheId] = cache.Serialize();
-            SessionLock.ExitWriteLock();
+        private void Persist()
+        {
+            sessionLock.EnterReadLock();
+
+            // Optimistically set HasStateChanged to false.
+            // We need to do it early to avoid losing changes made by a concurrent thread.
+            tokenCache.HasStateChanged = false;
+
+            httpContext.Session[cacheId] = tokenCache.Serialize();
+            sessionLock.ExitReadLock();
         }
 
         // Triggered right before MSAL needs to access the cache.
-        // Reload the cache from the persistent store in case it changed since the last access.
-        void BeforeAccessNotification(TokenCacheNotificationArgs args)
+        private void BeforeAccessNotification(TokenCacheNotificationArgs args)
         {
+            // Reload the cache from the persistent store in case it changed since the last access.
             Load();
         }
 
         // Triggered right after MSAL accessed the cache.
-        void AfterAccessNotification(TokenCacheNotificationArgs args)
+        private void AfterAccessNotification(TokenCacheNotificationArgs args)
         {
             // if the access operation resulted in a cache update
-            if (cache.HasStateChanged)
+            if (tokenCache.HasStateChanged)
             {
                 Persist();
             }
         }
 
+        public void SaveUserDetails(CachedUser user)
+        {
+            sessionLock.EnterReadLock();
+            httpContext.Session[cachedUserId] = JsonConvert.SerializeObject(user);
+            sessionLock.ExitReadLock();
+        }
+
+        public CachedUser GetUserDetails()
+        {
+            sessionLock.EnterReadLock();
+            var cachedUser = JsonConvert.DeserializeObject<CachedUser>((string)httpContext.Session[cachedUserId]);
+            sessionLock.ExitReadLock();
+            return cachedUser;
+        }
     }
 }

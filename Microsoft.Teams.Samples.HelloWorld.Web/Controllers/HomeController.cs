@@ -3,7 +3,12 @@ using System.Threading.Tasks;
 using System.Web.Mvc;
 using System.Collections.Generic;
 using System.Linq;
-using ContosoAirlines.Helpers;
+using Microsoft.Graph;
+using Microsoft.Teams.Samples.HelloWorld.TokenStorage;
+using System.Web;
+using System.Security.Claims;
+using Microsoft.Identity.Client;
+using System.Net.Http.Headers;
 
 namespace Microsoft.Teams.Samples.HelloWorld.Web.Controllers
 {
@@ -44,14 +49,45 @@ namespace Microsoft.Teams.Samples.HelloWorld.Web.Controllers
                 qandALookup[key] = model;
             }
 
-            var svc = new GraphService();
-            svc.accessToken = await SampleAuthProvider.Instance.GetUserAccessTokenAsync();
+            var client = GetAuthenticatedClient();
+
+            //var svc = new GraphService();
+            //svc.accessToken = await SampleAuthProvider.Instance.GetUserAccessTokenAsync();
             //string token = await MessagesController.GetToken();
             //svc.accessToken = token;
-            await svc.RefreshQandA(model);
+            //await svc.RefreshQandA(model);
 
             return View(model);
         }
+
+
+        private static GraphServiceClient GetAuthenticatedClient()
+        {
+            return new GraphServiceClient(
+                new DelegateAuthenticationProvider(
+                    async (requestMessage) =>
+                    {
+                        // Get the signed in user's id and create a token cache
+                        string signedInUserId = ClaimsPrincipal.Current.FindFirst(ClaimTypes.NameIdentifier).Value;
+                        SessionTokenStore tokenStore = new SessionTokenStore(signedInUserId,
+                            new HttpContextWrapper(System.Web.HttpContext.Current));
+
+                        var idClient = new ConfidentialClientApplication(
+                            Startup.appId, Startup.redirectUri, new ClientCredential(Startup.appSecret),
+                            tokenStore.GetMsalCacheInstance(), null);
+
+                        var accounts = await idClient.GetAccountsAsync();
+
+                        // By calling this here, the token can be refreshed
+                        // if it's expired right before the Graph call is made
+                        var result = await idClient.AcquireTokenSilentAsync(
+                            Startup.graphScopes.Split(' '), accounts.FirstOrDefault());
+
+                        requestMessage.Headers.Authorization =
+                            new AuthenticationHeaderValue("Bearer", result.AccessToken);
+                    }));
+        }
+
 
         public static readonly Dictionary<string, QandAModel> qandALookup = new Dictionary<string, QandAModel>();
 
