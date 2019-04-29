@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using System.Web.Mvc;
 using System.Collections.Generic;
 using System.Linq;
-
+using ContosoAirlines.Helpers;
 
 namespace Microsoft.Teams.Samples.HelloWorld.Web.Controllers
 {
@@ -17,6 +17,7 @@ namespace Microsoft.Teams.Samples.HelloWorld.Web.Controllers
             return View("Index", model);
         }
 
+        [Authorize]
         [Route("")]
         public async Task<ActionResult> Index()
         {
@@ -44,9 +45,10 @@ namespace Microsoft.Teams.Samples.HelloWorld.Web.Controllers
             }
 
             var svc = new GraphService();
-            string token = await MessagesController.GetToken();
-            svc.accessToken = token;
-            //await svc.RefreshQandA(model);
+            svc.accessToken = await SampleAuthProvider.Instance.GetUserAccessTokenAsync();
+            //string token = await MessagesController.GetToken();
+            //svc.accessToken = token;
+            await svc.RefreshQandA(model);
 
             return View(model);
         }
